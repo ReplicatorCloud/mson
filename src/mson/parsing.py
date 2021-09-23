@@ -12,8 +12,8 @@ def lark_quote(s: str) -> str:
     return "/" + s.replace("/", "\\/") + "/"
 
 
-STRING = r"\"(([^\x00-\x1f\x7f-\xff\"\\]|\\[bfnrt]|\\u[0-9a-fA-F]{4})*)\""
-BINARY = r"b\"([^\"\\\0\n\r]|\\[0nr\"])*\""
+STRING = r"\"(([^\\\"\x00-\x1f\x7f-\xff]|\\[bfnrt\"\\]|\\u[0-9a-fA-F]{4})*)\""
+BINARY = r"b\"([^\"\\\0\n\r]|\\[0nr\"\\])*\""
 NUMBER_FLOAT = (
     r"[+-]?([0-9]+([.][0-9]*)?([eE][+-]?[0-9]+)?|[.][0-9]+([eE][+-]?[0-9]+)?)"
 )
@@ -23,7 +23,7 @@ NUMBER_RATIONAL = r"r[+-]?[0-9]+(/([0-9]+))?"
 DATE = r"[+-]?[0-9]{4,}-[0-9]{2}-[0-9]{2}"
 DATE_TIME = r"[+-]?[0-9]{4,}-[0-9]{2}-[0-9]{2}( \d{2}(:\d{2}(:\d{2}(\.\d+)?)?)?|T\d{2}(\d{2}(\d{2}(\.\d+)?)?)?)(Z|[+-]\d{2}(:?\d{2})?)?"
 
-UNESCAPE_BINARY = re.compile(br'\\([rn0"])')
+UNESCAPE_BINARY = re.compile(br'\\([rn0"\\])')
 
 
 GRAMMAR = f"""
@@ -115,6 +115,7 @@ class MsonTransformer(Transformer):
                 b"n": b"\n",
                 b"0": b"\0",
                 b'"': b'"',
+                b"\\": b"\\",
             }[m.group(1)],
             data[2:-1],
         )

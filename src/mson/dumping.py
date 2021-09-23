@@ -6,7 +6,7 @@ from decimal import Decimal
 from fractions import Fraction
 from typing import Any
 
-ESCAPE_BINARY = re.compile(b'[\r\n\0"]')
+ESCAPE_BINARY = re.compile(br'[\r\n\x00\\"]')
 
 NoneType = None.__class__  # noqa
 
@@ -89,6 +89,7 @@ class MsonEncoder:
                     b"\n": b"n",
                     b"\0": b"0",
                     b'"': b'"',
+                    b"\\": b"\\",
                 }[m.group(0)],
                 v,
             )

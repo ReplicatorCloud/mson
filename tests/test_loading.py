@@ -2,7 +2,7 @@ from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from fractions import Fraction
 
-from mson import loads
+from mson import dumps, loads
 
 
 def test_string():
@@ -70,3 +70,15 @@ def test_decode_list():
 def test_decode_dict():
     assert loads(b"{i42:true}") == {42: True}
     assert loads(b"{[i1]:true,[i2]:false}") == {(1,): True, (2,): False}
+
+
+def test_bench_bug_1():
+    assert loads(b'"<a rel=\\"nofollow\\">"') == '<a rel="nofollow">'
+    assert dumps('<a rel="nofollow">') == b'"<a rel=\\"nofollow\\">"'
+
+
+def test_bench_bug_2():
+    full_line = "\\( \u02c6o\u02c6 )/"
+    assert loads(dumps(full_line)) == full_line
+    assert dumps(b'"\\"') == b'b"\\"\\\\\\""'
+    assert loads(b'b"\\"\\\\\\""') == b'"\\"'
